@@ -1,4 +1,5 @@
-import { Stage, ColorLayer, Text, UITextButton, save, state } from "melonjs";
+import { Stage, ColorLayer, Text, save, state } from "melonjs";
+import MenuButton from "../ui/menubutton";
 
 const BACKGROUND_COLOR = "#0d1420";
 
@@ -23,7 +24,7 @@ const RED = "#b33a3a";
 const RED_HOVER_OFF = "rgba(179, 58, 58, 0.15)";
 const RED_HOVER_ON = "rgba(179, 58, 58, 0.4)";
 
-class NewGameButton extends UITextButton {
+class NewGameButton extends MenuButton {
     constructor(x, y) {
         super(x, y, {
             font: "PressStart2P",
@@ -38,15 +39,14 @@ class NewGameButton extends UITextButton {
         });
     }
 
-    onClick() {
+    onAction() {
         // TODO: reset player/quest state here once that system exists
         save.hasSave = true;
         state.change(state.PLAY);
-        return false;
     }
 }
 
-class ContinueButton extends UITextButton {
+class ContinueButton extends MenuButton {
     constructor(x, y) {
         const hasSave = save.hasSave === true;
 
@@ -66,14 +66,15 @@ class ContinueButton extends UITextButton {
         this.isClickable = hasSave;
     }
 
-    onClick() {
-        // TODO: load the actual saved game state here once that system exists
+    onAction() {
+        // TODO: once the save system exists, this should open a save-slot
+        // picker (all existing save files) instead of jumping straight
+        // into PLAY -- for now it just resumes, same as New Game
         state.change(state.PLAY);
-        return false;
     }
 }
 
-class SettingsButton extends UITextButton {
+class SettingsButton extends MenuButton {
     constructor(x, y) {
         super(x, y, {
             font: "PressStart2P",
@@ -88,13 +89,12 @@ class SettingsButton extends UITextButton {
         });
     }
 
-    onClick() {
+    onAction() {
         state.change(state.SETTINGS);
-        return false;
     }
 }
 
-class ExitButton extends UITextButton {
+class ExitButton extends MenuButton {
     constructor(x, y) {
         super(x, y, {
             font: "PressStart2P",
@@ -109,7 +109,7 @@ class ExitButton extends UITextButton {
         });
     }
 
-    onClick() {
+    onAction() {
         // running inside Electron: ask the main process to quit for real
         // running in a plain browser tab: the best JS can do is try to
         // close the tab, which only works for script-opened windows
@@ -118,7 +118,6 @@ class ExitButton extends UITextButton {
         } else {
             window.close();
         }
-        return false;
     }
 }
 

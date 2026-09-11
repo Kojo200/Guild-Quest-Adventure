@@ -1,8 +1,11 @@
-import { Stage, ColorLayer, Text, input, timer, event, state } from "melonjs";
+import { Stage, ColorLayer, Text, Sprite, input, timer, event, state } from "melonjs";
 
 /**
  * @typedef {object} SplashScreenSettings
- * @property {string} text - main placeholder text (swap for a logo Sprite once real artwork exists)
+ * @property {string} [text] - placeholder text logo, used when no image is given
+ * @property {string} [image] - name of a preloaded image asset to use as the real logo
+ * @property {number} [imageWidth] - native pixel width of that image (for contain-fit scaling)
+ * @property {number} [imageHeight] - native pixel height of that image (for contain-fit scaling)
  * @property {string} [subtitle] - small hint shown near the bottom of the screen
  * @property {string} [backgroundColor]
  * @property {string} [textColor]
@@ -41,6 +44,9 @@ class SplashScreen extends Stage {
 
         const {
             text,
+            image,
+            imageWidth,
+            imageHeight,
             subtitle,
             backgroundColor = DEFAULT_BACKGROUND_COLOR,
             textColor = DEFAULT_TEXT_COLOR,
@@ -49,17 +55,31 @@ class SplashScreen extends Stage {
 
         app.world.addChild(new ColorLayer("background", backgroundColor), 0);
 
-        app.world.addChild(
-            new Text(app.viewport.width / 2, app.viewport.height / 2, {
-                font: "sans-serif",
-                size: 28,
-                fillStyle: textColor,
-                textAlign: "center",
-                textBaseline: "middle",
-                text,
-            }),
-            1,
-        );
+        if (image) {
+            const logo = new Sprite(app.viewport.width / 2, app.viewport.height / 2, { image });
+
+            // scale to fit inside the viewport without cropping or stretching
+            const scale = Math.min(
+                app.viewport.width / (imageWidth ?? logo.width),
+                app.viewport.height / (imageHeight ?? logo.height),
+            );
+            logo.scale(scale);
+
+            app.world.addChild(logo, 1);
+        } else {
+            // placeholder text logo -- swap for a Sprite once real artwork exists
+            app.world.addChild(
+                new Text(app.viewport.width / 2, app.viewport.height / 2, {
+                    font: "sans-serif",
+                    size: 28,
+                    fillStyle: textColor,
+                    textAlign: "center",
+                    textBaseline: "middle",
+                    text,
+                }),
+                1,
+            );
+        }
 
         if (subtitle) {
             app.world.addChild(

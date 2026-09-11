@@ -1,4 +1,5 @@
-import { Stage, ColorLayer, Text, UITextButton, state } from "melonjs";
+import { Stage, ColorLayer, Text, state } from "melonjs";
+import MenuButton from "../ui/menubutton";
 
 const BACKGROUND_COLOR = "#0d1420";
 const BACK_WIDTH = 140;
@@ -6,7 +7,7 @@ const BACK_HEIGHT = 36;
 const MARGIN = 20;
 const GOLD = "#c9a86a";
 
-class BackButton extends UITextButton {
+class BackButton extends MenuButton {
     constructor(x, y) {
         super(x, y, {
             font: "PressStart2P",
@@ -21,9 +22,8 @@ class BackButton extends UITextButton {
         });
     }
 
-    onClick() {
+    onAction() {
         state.change(state.MENU);
-        return false;
     }
 }
 

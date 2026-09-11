@@ -41,12 +41,19 @@ const GAME_LOGO = state.USER + 1;
 
 // set and load all resources
 loader.preload(DataManifest, () => {
+    // fade to black between every state change instead of a hard cut --
+    // this is what makes the studio logo -> game logo -> title screen
+    // sequence feel like a boot sequence instead of a slideshow
+    state.transition("fade", "#000000", 400);
+
     // boot sequence: studio logo -> game logo -> title screen
     state.set(
         STUDIO_LOGO,
         new SplashScreen({
-            // TODO: swap for the studio's actual logo once it's ready
-            text: "[ STUDIO LOGO PLACEHOLDER ]",
+            image: "studio_logo",
+            imageWidth: 1920,
+            imageHeight: 1080,
+            backgroundColor: "#000000",
             subtitle: "click or press any key to continue",
             nextState: GAME_LOGO,
         }),
