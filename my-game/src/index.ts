@@ -1,6 +1,7 @@
 import { Application, audio, loader, state, plugin, pool } from "melonjs";
 import TitleScreen from "./scripts/stage/title";
 import PlayScreen from "./scripts/stage/play";
+import SplashScreen from "./scripts/stage/splashscreen";
 import PlayerEntity from "./scripts/renderables/player";
 import DataManifest from "./manifest";
 import "./index.css";
@@ -29,8 +30,33 @@ if (import.meta.env.DEV) {
     });
 }
 
+// custom boot-sequence states, on top of melonJS's built-in ones
+const STUDIO_LOGO = state.USER + 0;
+const GAME_LOGO = state.USER + 1;
+
 // set and load all resources
 loader.preload(DataManifest, () => {
+    // boot sequence: studio logo -> game logo -> title screen
+    state.set(
+        STUDIO_LOGO,
+        new SplashScreen({
+            // TODO: swap for the studio's actual logo once it's ready
+            text: "[ STUDIO LOGO PLACEHOLDER ]",
+            subtitle: "click or press any key to continue",
+            nextState: GAME_LOGO,
+        }),
+    );
+    state.set(
+        GAME_LOGO,
+        new SplashScreen({
+            // TODO: swap for the game's actual logo once it's ready
+            text: "GUILD QUEST ADVENTURE",
+            subtitle: "click or press any key to continue",
+            textColor: "#c9a86a",
+            nextState: state.MENU,
+        }),
+    );
+
     // set the user defined game stages
     state.set(state.MENU, new TitleScreen());
     state.set(state.PLAY, new PlayScreen());
@@ -39,5 +65,5 @@ loader.preload(DataManifest, () => {
     pool.register("mainPlayer", PlayerEntity);
 
     // start the game
-    state.change(state.PLAY, false);
+    state.change(STUDIO_LOGO, false);
 });
