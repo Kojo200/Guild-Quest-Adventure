@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 
 let mainWindow = null;
@@ -27,6 +27,12 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+
+// the renderer can't call app.quit() directly -- it asks the main
+// process to do it via this IPC channel (see src/electron/preload.js)
+ipcMain.handle("app:quit", () => {
+    app.quit();
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {

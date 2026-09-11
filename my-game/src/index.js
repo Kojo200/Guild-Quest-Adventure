@@ -1,6 +1,7 @@
-import { Application, audio, loader, state, plugin, pool } from "melonjs";
+import { Application, audio, loader, state, plugin, pool, save } from "melonjs";
 import TitleScreen from "./scripts/stage/title";
 import PlayScreen from "./scripts/stage/play";
+import SettingsScreen from "./scripts/stage/settings";
 import SplashScreen from "./scripts/stage/splashscreen";
 import PlayerEntity from "./scripts/renderables/player";
 import DataManifest from "./manifest";
@@ -29,6 +30,10 @@ if (import.meta.env.DEV) {
         plugin.register(debugPlugin.DebugPanelPlugin, "debugPanel");
     });
 }
+
+// persisted across sessions (localStorage) -- tracks whether "Continue"
+// on the title screen should be enabled
+save.add({ hasSave: false });
 
 // custom boot-sequence states, on top of melonJS's built-in ones
 const STUDIO_LOGO = state.USER + 0;
@@ -60,6 +65,7 @@ loader.preload(DataManifest, () => {
     // set the user defined game stages
     state.set(state.MENU, new TitleScreen());
     state.set(state.PLAY, new PlayScreen());
+    state.set(state.SETTINGS, new SettingsScreen());
 
     // add our player entity in the entity pool
     pool.register("mainPlayer", PlayerEntity);
