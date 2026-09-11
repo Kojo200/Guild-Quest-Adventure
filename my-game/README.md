@@ -1,13 +1,12 @@
-# melonJS TypeScript Boilerplate
+# melonJS JavaScript Boilerplate
 ![melonJS Logo](https://github.com/melonjs/melonJS/raw/master/media/Banner/Banner%20-%20Billboard%20-%20Original%20Logo%20-%20horizontal.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A simple TypeScript + Vite boilerplate to create games with [melonJS](https://github.com/melonjs/melonJS).
+A simple JavaScript + Vite boilerplate to create games with [melonJS](https://github.com/melonjs/melonJS).
 
 Built with:
 - [melonJS 2](https://github.com/melonjs/melonJS) — lightweight HTML5 game engine
-- [TypeScript](https://www.typescriptlang.org) — type-safe JavaScript
 - [Vite](https://vitejs.dev) — fast dev server and bundler
 - melonJS [debug plugin](https://github.com/melonjs/debug-plugin) — auto-loaded in development mode
 
@@ -40,14 +39,14 @@ src/
 ├── scripts/
 │   ├── renderables/       # game objects (player, enemies, etc.)
 │   └── stage/             # game screens (title, play, etc.)
-├── index.ts               # entry point
+├── index.js               # entry point
 ├── index.css              # base styles
-└── manifest.ts            # asset list for the melonJS preloader
+└── manifest.js            # asset list for the melonJS preloader
 ```
 
-## Prefer JavaScript?
+## Prefer TypeScript?
 
-This boilerplate works with plain JavaScript too. Just rename `.ts` files to `.js` — TypeScript is optional, not required. Vite handles both seamlessly.
+This boilerplate works with TypeScript too. Just rename `.js` files to `.ts` and add a `tsconfig.json` — TypeScript is optional, not required. Vite handles both seamlessly.
 
 ## Debug Plugin
 

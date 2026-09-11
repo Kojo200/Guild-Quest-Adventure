@@ -1,17 +1,14 @@
-import { type Application, Stage, ColorLayer, Text, input, timer, event, state } from "melonjs";
+import { Stage, ColorLayer, Text, input, timer, event, state } from "melonjs";
 
-interface SplashScreenSettings {
-    /** main placeholder text (swap for a logo Sprite once real artwork exists) */
-    text: string;
-    /** small hint shown near the bottom of the screen */
-    subtitle?: string;
-    backgroundColor?: string;
-    textColor?: string;
-    /** how long to display before auto-advancing, in ms */
-    duration?: number;
-    /** state to switch to once this splash screen is done */
-    nextState: number;
-}
+/**
+ * @typedef {object} SplashScreenSettings
+ * @property {string} text - main placeholder text (swap for a logo Sprite once real artwork exists)
+ * @property {string} [subtitle] - small hint shown near the bottom of the screen
+ * @property {string} [backgroundColor]
+ * @property {string} [textColor]
+ * @property {number} [duration] - how long to display before auto-advancing, in ms
+ * @property {number} nextState - state to switch to once this splash screen is done
+ */
 
 const DEFAULT_DURATION = 2000;
 const DEFAULT_BACKGROUND_COLOR = "#0a0a0a";
@@ -24,17 +21,23 @@ const SUBTITLE_COLOR = "#666666";
  * early with a click/tap or by pressing enter/space/esc.
  */
 class SplashScreen extends Stage {
-    private config: SplashScreenSettings;
-    private advanced = false;
-    private timeoutId?: number;
+    #config;
+    #advanced = false;
+    #timeoutId;
 
-    constructor(settings: SplashScreenSettings) {
+    /**
+     * @param {SplashScreenSettings} settings
+     */
+    constructor(settings) {
         super();
-        this.config = settings;
+        this.#config = settings;
     }
 
-    onResetEvent(app: Application) {
-        this.advanced = false;
+    /**
+     * @param {import("melonjs").Application} app
+     */
+    onResetEvent(app) {
+        this.#advanced = false;
 
         const {
             text,
@@ -42,7 +45,7 @@ class SplashScreen extends Stage {
             backgroundColor = DEFAULT_BACKGROUND_COLOR,
             textColor = DEFAULT_TEXT_COLOR,
             duration = DEFAULT_DURATION,
-        } = this.config;
+        } = this.#config;
 
         app.world.addChild(new ColorLayer("background", backgroundColor), 0);
 
@@ -76,35 +79,38 @@ class SplashScreen extends Stage {
         input.bindKey(input.KEY.ENTER, "skip", true);
         input.bindKey(input.KEY.SPACE, "skip", true);
         input.bindKey(input.KEY.ESC, "skip", true);
-        event.on(event.GAME_UPDATE, this.checkSkip);
-        input.registerPointerEvent("pointerdown", app.viewport, this.advance);
+        event.on(event.GAME_UPDATE, this.#checkSkip);
+        input.registerPointerEvent("pointerdown", app.viewport, this.#advance);
 
-        this.timeoutId = timer.setTimeout(this.advance, duration);
+        this.#timeoutId = timer.setTimeout(this.#advance, duration);
     }
 
-    onDestroyEvent(app: Application) {
-        if (this.timeoutId !== undefined) {
-            timer.clearTimeout(this.timeoutId);
+    /**
+     * @param {import("melonjs").Application} app
+     */
+    onDestroyEvent(app) {
+        if (this.#timeoutId !== undefined) {
+            timer.clearTimeout(this.#timeoutId);
         }
         input.unbindKey(input.KEY.ENTER);
         input.unbindKey(input.KEY.SPACE);
         input.unbindKey(input.KEY.ESC);
-        event.off(event.GAME_UPDATE, this.checkSkip);
-        input.releasePointerEvent("pointerdown", app.viewport, this.advance);
+        event.off(event.GAME_UPDATE, this.#checkSkip);
+        input.releasePointerEvent("pointerdown", app.viewport, this.#advance);
     }
 
-    private checkSkip = () => {
+    #checkSkip = () => {
         if (input.isKeyPressed("skip")) {
-            this.advance();
+            this.#advance();
         }
     };
 
-    private advance = () => {
-        if (this.advanced) {
+    #advance = () => {
+        if (this.#advanced) {
             return;
         }
-        this.advanced = true;
-        state.change(this.config.nextState);
+        this.#advanced = true;
+        state.change(this.#config.nextState);
     };
 }
 

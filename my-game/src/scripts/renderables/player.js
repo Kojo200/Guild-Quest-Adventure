@@ -4,16 +4,20 @@ class PlayerEntity extends Sprite {
 
     /**
      * constructor
+     * @param {number} x
+     * @param {number} y
+     * @param {{ image: string, [key: string]: unknown }} settings
      */
-    constructor(x: number, y: number, settings: { image: string; [key: string]: unknown }) {
+    constructor(x, y, settings) {
         // call the parent constructor
         super(x, y, settings);
     }
 
     /**
      * update the entity
+     * @param {number} dt
      */
-    override update(dt: number) {
+    update(dt) {
         // change body force based on inputs
         // ...
         // call the parent method
@@ -24,7 +28,7 @@ class PlayerEntity extends Sprite {
      * collision handler
      * (called when colliding with other objects)
      */
-    override onCollision() {
+    onCollision() {
         // Make all other objects solid
         return true;
     }

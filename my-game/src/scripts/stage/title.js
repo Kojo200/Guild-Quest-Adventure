@@ -1,17 +1,19 @@
-import { type Application, Stage } from "melonjs";
+import { Stage } from "melonjs";
 
 class TitleScreen extends Stage {
     /**
      *  action to perform on state change
+     *  @param {import("melonjs").Application} app
      */
-    onResetEvent(app: Application) {
+    onResetEvent(app) {
         // TODO
     }
 
     /**
      *  action to perform when leaving this screen (state change)
+     *  @param {import("melonjs").Application} app
      */
-    onDestroyEvent(app: Application) {
+    onDestroyEvent(app) {
         // TODO
     }
 }
