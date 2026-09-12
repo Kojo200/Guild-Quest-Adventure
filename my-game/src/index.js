@@ -11,6 +11,11 @@ import "./index.css";
 const app = new Application(1218, 562, {
     parent: "screen",
     scale: "auto",
+    // "manual" (the default) never re-fits the canvas when its container
+    // resizes -- e.g. entering fullscreen -- so it's left at whatever size
+    // it started at. "flex" resizes the canvas to fill whatever space is
+    // available, so fullscreen (and any window resize) actually fills it.
+    scaleMethod: "flex",
 });
 
 // mandatory since melonJS 20.0: this is what builds the renderer and adds
@@ -43,6 +48,7 @@ save.add({
     musicVolume: 1,
     sfxVolume: 1,
     pixelPerfect: false,
+    antiAliasing: false,
     keyBindings: {
         moveUp: input.KEY.W,
         moveDown: input.KEY.S,
@@ -57,7 +63,8 @@ save.add({
 if (save.masterMuted) {
     audio.muteAll();
 }
-app.renderer.setTextureFilter(save.pixelPerfect ? "nearest" : "auto");
+app.renderer.setAntiAlias(save.antiAliasing);
+app.renderer.setTextureFilter(save.pixelPerfect ? "nearest" : "linear");
 for (const [action, keyCode] of Object.entries(save.keyBindings)) {
     input.bindKey(keyCode, action);
 }

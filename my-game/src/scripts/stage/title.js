@@ -1,4 +1,5 @@
-import { Stage, ColorLayer, Text, save, state } from "melonjs";
+import { ColorLayer, Text, save, state } from "melonjs";
+import ResponsiveStage from "./responsivestage";
 import MenuButton from "../ui/menubutton";
 
 const BACKGROUND_COLOR = "#0d1420";
@@ -124,17 +125,17 @@ class ExitButton extends MenuButton {
     }
 }
 
-class TitleScreen extends Stage {
+class TitleScreen extends ResponsiveStage {
     /**
-     *  action to perform on state change
+     *  (re)builds every child on load and on every viewport resize
      *  @param {import("melonjs").Application} app
      */
-    onResetEvent(app) {
+    layout(app) {
         const { width, height } = app.viewport;
 
-        app.world.addChild(new ColorLayer("background", BACKGROUND_COLOR), 0);
+        this.addLayoutChild(new ColorLayer("background", BACKGROUND_COLOR), 0);
 
-        app.world.addChild(
+        this.addLayoutChild(
             new Text(width / 2, 90, {
                 font: "sans-serif",
                 size: 34,
@@ -149,20 +150,20 @@ class TitleScreen extends Stage {
         const buttonX = (width - BUTTON_WIDTH) / 2;
         let y = height / 2 - BUTTON_SPACING;
 
-        app.world.addChild(new NewGameButton(buttonX, y), 1);
+        this.addLayoutChild(new NewGameButton(buttonX, y), 1);
         y += BUTTON_SPACING;
-        app.world.addChild(new ContinueButton(buttonX, y), 1);
+        this.addLayoutChild(new ContinueButton(buttonX, y), 1);
         y += BUTTON_SPACING;
-        app.world.addChild(new SettingsButton(buttonX, y), 1);
+        this.addLayoutChild(new SettingsButton(buttonX, y), 1);
 
         // exit button always sits in the bottom-right corner
-        app.world.addChild(
+        this.addLayoutChild(
             new ExitButton(width - EXIT_WIDTH - EXIT_MARGIN, height - EXIT_HEIGHT - EXIT_MARGIN),
             1,
         );
 
         // studio credit, bottom-left corner
-        app.world.addChild(
+        this.addLayoutChild(
             new Text(CREDIT_MARGIN, height - CREDIT_MARGIN, {
                 font: "sans-serif",
                 size: 13,

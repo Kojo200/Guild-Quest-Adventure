@@ -1,4 +1,5 @@
-import { Stage, ColorLayer, Text, Sprite, input, timer, event, state } from "melonjs";
+import { ColorLayer, Text, Sprite, input, timer, event, state } from "melonjs";
+import ResponsiveStage from "./responsivestage";
 
 /**
  * @typedef {object} SplashScreenSettings
@@ -21,9 +22,10 @@ const SUBTITLE_COLOR = "#666666";
 /**
  * a generic boot-sequence splash screen (studio logo, game logo, etc).
  * displays placeholder text for a fixed duration, and can be skipped
- * early with a click/tap or by pressing enter/space/esc.
+ * early with a click/tap or by pressing enter/space/esc. Layout rebuilds
+ * automatically on viewport resize (see ResponsiveStage).
  */
-class SplashScreen extends Stage {
+class SplashScreen extends ResponsiveStage {
     #config;
     #advanced = false;
     #timeoutId;
@@ -40,8 +42,41 @@ class SplashScreen extends Stage {
      * @param {import("melonjs").Application} app
      */
     onResetEvent(app) {
+        super.onResetEvent(app); // builds the layout below + resize handling
+
         this.#advanced = false;
 
+        // one-time setup: skip controls. Not resize-dependent, so this
+        // stays out of layout() and isn't rebuilt on every resize.
+        input.bindKey(input.KEY.ENTER, "skip", true);
+        input.bindKey(input.KEY.SPACE, "skip", true);
+        input.bindKey(input.KEY.ESC, "skip", true);
+        event.on(event.GAME_UPDATE, this.#checkSkip);
+        input.registerPointerEvent("pointerdown", app.viewport, this.#advance);
+
+        this.#timeoutId = timer.setTimeout(this.#advance, this.#config.duration ?? DEFAULT_DURATION);
+    }
+
+    /**
+     * @param {import("melonjs").Application} app
+     */
+    onDestroyEvent(app) {
+        super.onDestroyEvent(app);
+
+        if (this.#timeoutId !== undefined) {
+            timer.clearTimeout(this.#timeoutId);
+        }
+        input.unbindKey(input.KEY.ENTER);
+        input.unbindKey(input.KEY.SPACE);
+        input.unbindKey(input.KEY.ESC);
+        event.off(event.GAME_UPDATE, this.#checkSkip);
+        input.releasePointerEvent("pointerdown", app.viewport, this.#advance);
+    }
+
+    /**
+     * @param {import("melonjs").Application} app
+     */
+    layout(app) {
         const {
             text,
             image,
@@ -50,10 +85,9 @@ class SplashScreen extends Stage {
             subtitle,
             backgroundColor = DEFAULT_BACKGROUND_COLOR,
             textColor = DEFAULT_TEXT_COLOR,
-            duration = DEFAULT_DURATION,
         } = this.#config;
 
-        app.world.addChild(new ColorLayer("background", backgroundColor), 0);
+        this.addLayoutChild(new ColorLayer("background", backgroundColor), 0);
 
         if (image) {
             const logo = new Sprite(app.viewport.width / 2, app.viewport.height / 2, { image });
@@ -65,10 +99,10 @@ class SplashScreen extends Stage {
             );
             logo.scale(scale);
 
-            app.world.addChild(logo, 1);
+            this.addLayoutChild(logo, 1);
         } else {
             // placeholder text logo -- swap for a Sprite once real artwork exists
-            app.world.addChild(
+            this.addLayoutChild(
                 new Text(app.viewport.width / 2, app.viewport.height / 2, {
                     font: "sans-serif",
                     size: 28,
@@ -82,7 +116,7 @@ class SplashScreen extends Stage {
         }
 
         if (subtitle) {
-            app.world.addChild(
+            this.addLayoutChild(
                 new Text(app.viewport.width / 2, app.viewport.height - 24, {
                     font: "sans-serif",
                     size: 12,
@@ -94,29 +128,6 @@ class SplashScreen extends Stage {
                 1,
             );
         }
-
-        // allow the player to skip ahead instead of waiting out the timer
-        input.bindKey(input.KEY.ENTER, "skip", true);
-        input.bindKey(input.KEY.SPACE, "skip", true);
-        input.bindKey(input.KEY.ESC, "skip", true);
-        event.on(event.GAME_UPDATE, this.#checkSkip);
-        input.registerPointerEvent("pointerdown", app.viewport, this.#advance);
-
-        this.#timeoutId = timer.setTimeout(this.#advance, duration);
-    }
-
-    /**
-     * @param {import("melonjs").Application} app
-     */
-    onDestroyEvent(app) {
-        if (this.#timeoutId !== undefined) {
-            timer.clearTimeout(this.#timeoutId);
-        }
-        input.unbindKey(input.KEY.ENTER);
-        input.unbindKey(input.KEY.SPACE);
-        input.unbindKey(input.KEY.ESC);
-        event.off(event.GAME_UPDATE, this.#checkSkip);
-        input.releasePointerEvent("pointerdown", app.viewport, this.#advance);
     }
 
     #checkSkip = () => {

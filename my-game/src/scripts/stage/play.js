@@ -1,15 +1,16 @@
-import { Stage, ColorLayer } from "melonjs";
+import { ColorLayer } from "melonjs";
+import ResponsiveStage from "./responsivestage";
 
-class PlayScreen extends Stage {
-    /**
-     *  action to perform on state change
-     *  @param {import("melonjs").Application} app
-     */
-    onResetEvent(app) {
-        // add a gray background to the default Stage
-        // TODO: replace with the guild hub / quest level once it's built
-        app.world.addChild(new ColorLayer("background", "#202020"), 0);
-    }
+class PlayScreen extends ResponsiveStage {
+  /**
+   *  (re)builds every child on load and on every viewport resize
+   *  @param {import("melonjs").Application} app
+   */
+  layout(app) {
+    // add a gray background to the default Stage
+    // TODO: replace with the guild hub / quest level once it's built
+    this.addLayoutChild(new ColorLayer("background", "#202020"), 0);
+  }
 }
 
 export default PlayScreen;
