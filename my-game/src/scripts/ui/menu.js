@@ -4,7 +4,7 @@ import { UITextButton, audio, save } from "melonjs";
  * a UITextButton that plays the shared hover/select sound effects
  * automatically. subclasses implement onAction() instead of onClick().
  */
-class MenuButton extends UITextButton {
+class menuButton extends UITextButton {
     onOver(event) {
         audio.play("button_hover", false, null, save.sfxVolume);
         return super.onOver(event);
@@ -26,4 +26,4 @@ class MenuButton extends UITextButton {
     }
 }
 
-export default MenuButton;
+export default menuButton;

@@ -1,7 +1,7 @@
 import { ColorLayer } from "melonjs";
-import ResponsiveStage from "./responsivestage";
+import responsiveStage from "./responsiveStage";
 
-class PlayScreen extends ResponsiveStage {
+class PlayScreen extends responsiveStage {
   /**
    *  (re)builds every child on load and on every viewport resize
    *  @param {import("melonjs").Application} app

@@ -16,53 +16,55 @@ import { Stage, event } from "melonjs";
  * (timers, input bindings, raw event listeners) can still override
  * `onResetEvent` / `onDestroyEvent` -- just call the `super` version too.
  */
-class ResponsiveStage extends Stage {
-    #app;
-    #layoutChildren = [];
-    #onResize = () => this.refresh();
+class responsiveStage extends Stage {
+  #app;
+  #layoutChildren = [];
+  #onResize = () => this.refresh();
 
-    /**
-     * @param {import("melonjs").Application} app
-     */
-    onResetEvent(app) {
-        this.#app = app;
-        this.refresh();
-        event.on(event.VIEWPORT_ONRESIZE, this.#onResize);
-    }
+  /**
+   * @param {import("melonjs").Application} app
+   */
+  onResetEvent(app) {
+    this.#app = app;
+    this.refresh();
+    event.on(event.VIEWPORT_ONRESIZE, this.#onResize);
+  }
 
-    onDestroyEvent() {
-        event.off(event.VIEWPORT_ONRESIZE, this.#onResize);
-    }
+  onDestroyEvent() {
+    event.off(event.VIEWPORT_ONRESIZE, this.#onResize);
+  }
 
-    /**
-     * add a renderable that belongs to the current layout. Call this
-     * instead of `app.world.addChild` from within `layout()`.
-     */
-    addLayoutChild(renderable, z) {
-        this.#app.world.addChild(renderable, z);
-        this.#layoutChildren.push(renderable);
-    }
+  /**
+   * add a renderable that belongs to the current layout. Call this
+   * instead of `app.world.addChild` from within `layout()`.
+   */
+  addLayoutChild(renderable, z) {
+    this.#app.world.addChild(renderable, z);
+    this.#layoutChildren.push(renderable);
+  }
 
-    /**
-     * force a full layout rebuild -- call after anything that changes
-     * what `layout()` should draw (e.g. switching a settings tab).
-     * Also called automatically on viewport resize.
-     */
-    refresh() {
-        this.#layoutChildren.forEach((child) => this.#app.world.removeChildNow(child));
-        this.#layoutChildren = [];
-        this.layout(this.#app);
-    }
+  /**
+   * force a full layout rebuild -- call after anything that changes
+   * what `layout()` should draw (e.g. switching a settings tab).
+   * Also called automatically on viewport resize.
+   */
+  refresh() {
+    this.#layoutChildren.forEach((child) =>
+      this.#app.world.removeChildNow(child),
+    );
+    this.#layoutChildren = [];
+    this.layout(this.#app);
+  }
 
-    /**
-     * override in subclasses: (re)build every visual child via
-     * `this.addLayoutChild(...)`. Called on first load, on every
-     * viewport resize, and whenever a subclass calls `this.refresh()`.
-     * @param {import("melonjs").Application} app
-     */
-    layout(app) {
-        // no-op by default
-    }
+  /**
+   * override in subclasses: (re)build every visual child via
+   * `this.addLayoutChild(...)`. Called on first load, on every
+   * viewport resize, and whenever a subclass calls `this.refresh()`.
+   * @param {import("melonjs").Application} app
+   */
+  layout(app) {
+    // no-op by default
+  }
 }
 
-export default ResponsiveStage;
+export default responsiveStage;

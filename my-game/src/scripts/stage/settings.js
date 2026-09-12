@@ -1,8 +1,8 @@
 import { ColorLayer, Text, save, state, audio, input } from "melonjs";
-import ResponsiveStage from "./responsivestage";
-import MenuButton from "../ui/menubutton";
-import CycleButton from "../ui/cyclebutton";
-import KeyBindButton from "../ui/keybindbutton";
+import responsiveStage from "./responsiveStage";
+import menuButton from "../ui/menu";
+import cycleButton from "../ui/cycleButton";
+import keyBindButton from "../ui/keybind";
 
 const BACKGROUND_COLOR = "#0d1420";
 
@@ -42,7 +42,7 @@ const BUTTON_STYLE = {
   hoverOnColor: GOLD_HOVER_ON,
 };
 
-class BackButton extends MenuButton {
+class BackButton extends menuButton {
   constructor(x, y) {
     super(x, y, {
       font: "PressStart2P",
@@ -62,7 +62,7 @@ class BackButton extends MenuButton {
   }
 }
 
-class TabButton extends MenuButton {
+class TabButton extends menuButton {
   constructor(x, y, label, isActive, onSelect) {
     super(x, y, {
       font: "PressStart2P",
@@ -83,7 +83,7 @@ class TabButton extends MenuButton {
   }
 }
 
-class StepButton extends MenuButton {
+class StepButton extends menuButton {
   constructor(x, y, label, onPress) {
     super(x, y, {
       font: "PressStart2P",
@@ -112,7 +112,7 @@ const DEFAULT_KEY_BINDINGS = () => ({
   interact: input.KEY.E,
 });
 
-class SettingsScreen extends ResponsiveStage {
+class SettingsScreen extends responsiveStage {
   #activeTab = TABS[0];
 
   /**
@@ -183,7 +183,7 @@ class SettingsScreen extends ResponsiveStage {
       );
       y += ROW_SPACING;
       this.addLayoutChild(
-        new CycleButton(rowX, y, {
+        new cycleButton(rowX, y, {
           ...BUTTON_STYLE,
           borderWidth: ROW_WIDTH,
           borderHeight: ROW_HEIGHT,
@@ -223,7 +223,7 @@ class SettingsScreen extends ResponsiveStage {
       ];
       for (const [label, action] of controls) {
         this.addLayoutChild(
-          new KeyBindButton(rowX, y, {
+          new keyBindButton(rowX, y, {
             ...BUTTON_STYLE,
             borderWidth: ROW_WIDTH,
             borderHeight: ROW_HEIGHT,
@@ -240,7 +240,7 @@ class SettingsScreen extends ResponsiveStage {
       }
     } else if (this.#activeTab === "Graphics") {
       this.addLayoutChild(
-        new CycleButton(rowX, y, {
+        new cycleButton(rowX, y, {
           ...BUTTON_STYLE,
           borderWidth: ROW_WIDTH,
           borderHeight: ROW_HEIGHT,
@@ -254,7 +254,7 @@ class SettingsScreen extends ResponsiveStage {
       );
       y += ROW_SPACING;
       this.addLayoutChild(
-        new CycleButton(rowX, y, {
+        new cycleButton(rowX, y, {
           ...BUTTON_STYLE,
           borderWidth: ROW_WIDTH,
           borderHeight: ROW_HEIGHT,
@@ -271,7 +271,7 @@ class SettingsScreen extends ResponsiveStage {
       );
       y += ROW_SPACING;
       this.addLayoutChild(
-        new CycleButton(rowX, y, {
+        new cycleButton(rowX, y, {
           ...BUTTON_STYLE,
           borderWidth: ROW_WIDTH,
           borderHeight: ROW_HEIGHT,
@@ -304,7 +304,7 @@ class SettingsScreen extends ResponsiveStage {
   }
 
   #toggleRow(x, y, label, saveKey, onChange) {
-    return new CycleButton(x, y, {
+    return new cycleButton(x, y, {
       ...BUTTON_STYLE,
       borderWidth: ROW_WIDTH,
       borderHeight: ROW_HEIGHT,
