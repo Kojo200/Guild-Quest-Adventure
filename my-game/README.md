@@ -21,6 +21,7 @@ Ensure you have [Node.js](http://nodejs.org/) installed, then install dependenci
 - `npm run dev` — start the dev server at `localhost:5173`
 - `npm run build` — generate a production build in the `dist` folder
 - `npm run preview` — preview the production build locally
+- `npm run electron:build` — generate a production build in the `dist` folder
 
 If everything goes well, you should see this:
 
