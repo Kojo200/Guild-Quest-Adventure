@@ -1,4 +1,4 @@
-import { Application, audio, loader, state, plugin, pool, save } from "melonjs";
+import { Application, audio, loader, state, plugin, pool, save, input } from "melonjs";
 import TitleScreen from "./scripts/stage/title";
 import PlayScreen from "./scripts/stage/play";
 import SettingsScreen from "./scripts/stage/settings";
@@ -32,8 +32,35 @@ if (import.meta.env.DEV) {
 }
 
 // persisted across sessions (localStorage) -- tracks whether "Continue"
-// on the title screen should be enabled
-save.add({ hasSave: false });
+// on the title screen should be enabled, plus every setting the Settings
+// screen exposes (Gameplay/Sound/Controls/Graphics)
+save.add({
+    hasSave: false,
+    screenShake: true,
+    damageNumbers: true,
+    difficulty: "normal",
+    masterMuted: false,
+    musicVolume: 1,
+    sfxVolume: 1,
+    pixelPerfect: false,
+    keyBindings: {
+        moveUp: input.KEY.W,
+        moveDown: input.KEY.S,
+        moveLeft: input.KEY.A,
+        moveRight: input.KEY.D,
+        interact: input.KEY.E,
+    },
+});
+
+// apply saved settings that need to take effect immediately, before the
+// player ever opens the Settings screen
+if (save.masterMuted) {
+    audio.muteAll();
+}
+app.renderer.setTextureFilter(save.pixelPerfect ? "nearest" : "auto");
+for (const [action, keyCode] of Object.entries(save.keyBindings)) {
+    input.bindKey(keyCode, action);
+}
 
 // custom boot-sequence states, on top of melonJS's built-in ones
 const STUDIO_LOGO = state.USER + 0;

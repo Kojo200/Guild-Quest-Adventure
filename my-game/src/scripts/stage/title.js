@@ -3,6 +3,9 @@ import MenuButton from "../ui/menubutton";
 
 const BACKGROUND_COLOR = "#0d1420";
 
+const CREDIT_MARGIN = 20;
+const CREDIT_COLOR = "#666666";
+
 const BUTTON_WIDTH = 220;
 const BUTTON_HEIGHT = 40;
 const BUTTON_SPACING = 56;
@@ -155,6 +158,19 @@ class TitleScreen extends Stage {
         // exit button always sits in the bottom-right corner
         app.world.addChild(
             new ExitButton(width - EXIT_WIDTH - EXIT_MARGIN, height - EXIT_HEIGHT - EXIT_MARGIN),
+            1,
+        );
+
+        // studio credit, bottom-left corner
+        app.world.addChild(
+            new Text(CREDIT_MARGIN, height - CREDIT_MARGIN, {
+                font: "sans-serif",
+                size: 13,
+                fillStyle: CREDIT_COLOR,
+                textAlign: "left",
+                textBaseline: "bottom",
+                text: "Made by Silent Edge Studio",
+            }),
             1,
         );
     }
