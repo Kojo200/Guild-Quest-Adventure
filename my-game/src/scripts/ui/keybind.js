@@ -1,8 +1,6 @@
 import { input } from "melonjs";
 import menuButton from "./menu";
 
-// build a keyCode -> friendly name lookup once, from melonJS's own KEY map
-// (input.KEY.W === 87, etc.) so labels never drift out of sync with it
 const KEY_NAMES = Object.fromEntries(
   Object.entries(input.KEY).map(([name, code]) => [code, name]),
 );
@@ -11,11 +9,6 @@ function keyLabel(keyCode) {
   return KEY_NAMES[keyCode] ?? `#${keyCode}`;
 }
 
-/**
- * a menuButton that rebinds a melonJS input action to a new key. Click it,
- * then press any key -- the action is rebound live (unbind old, bind new)
- * and onRebind(newKeyCode) is called so the caller can persist it.
- */
 class keyBindButton extends menuButton {
   #label;
   #action;
@@ -37,11 +30,6 @@ class keyBindButton extends menuButton {
     this.bitmapText.setText(`${this.#label}: ${keyLabel(newKeyCode)}`);
   };
 
-  /**
-   * @param {number} x
-   * @param {number} y
-   * @param {{label: string, action: string, keyCode: number, onRebind: (keyCode: number) => void} & Record<string, unknown>} settings
-   */
   constructor(x, y, settings) {
     const { label, action, keyCode, onRebind, ...buttonSettings } = settings;
 

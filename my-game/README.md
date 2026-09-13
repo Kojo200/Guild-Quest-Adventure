@@ -1,4 +1,5 @@
 # melonJS JavaScript Boilerplate
+
 ![melonJS Logo](https://github.com/melonjs/melonJS/raw/master/media/Banner/Banner%20-%20Billboard%20-%20Original%20Logo%20-%20horizontal.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -6,6 +7,7 @@
 A simple JavaScript + Vite boilerplate to create games with [melonJS](https://github.com/melonjs/melonJS).
 
 Built with:
+
 - [melonJS 2](https://github.com/melonjs/melonJS) — lightweight HTML5 game engine
 - [Vite](https://vitejs.dev) — fast dev server and bundler
 - melonJS [debug plugin](https://github.com/melonjs/debug-plugin) — auto-loaded in development mode

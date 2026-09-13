@@ -30,6 +30,19 @@ const DataManifest = [
         name: "studio_logo",
         type: "image",
         src: "/data/img/studio_logo.png"
+    },
+
+    /* Medieval UI kit (buttons, panels, etc.) -- sheets stay untouched,
+       exact pixel regions are sliced out at runtime via a TextureAtlas */
+    {
+        name: "ui_inputs",
+        type: "image",
+        src: "/data/img/ui_inputs.png"
+    },
+    {
+        name: "ui_frames",
+        type: "image",
+        src: "/data/img/ui_frames.png"
     }
 ];
 

@@ -47,7 +47,10 @@ save.add({
     masterMuted: false,
     musicVolume: 1,
     sfxVolume: 1,
-    pixelPerfect: false,
+    // pixel art game -- nearest-neighbor by default, or every scaled-up
+    // sprite (buttons, corner ornaments, etc.) renders blurry instead of
+    // crisp. Players can still switch to smooth filtering in Settings.
+    pixelPerfect: true,
     antiAliasing: false,
     keyBindings: {
         moveUp: input.KEY.W,
