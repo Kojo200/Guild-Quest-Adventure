@@ -11,16 +11,9 @@ import "./index.css";
 const app = new Application(1218, 562, {
     parent: "screen",
     scale: "auto",
-    // "manual" (the default) never re-fits the canvas when its container
-    // resizes -- e.g. entering fullscreen -- so it's left at whatever size
-    // it started at. "flex" resizes the canvas to fill whatever space is
-    // available, so fullscreen (and any window resize) actually fills it.
     scaleMethod: "flex",
 });
 
-// mandatory since melonJS 20.0: this is what builds the renderer and adds
-// the canvas to the page. It is asynchronous so a WebGPU device can be
-// acquired, and resolves without suspending on the WebGL and Canvas backends.
 await app.init();
 
 // initialize the audio
@@ -36,9 +29,7 @@ if (import.meta.env.DEV) {
     });
 }
 
-// persisted across sessions (localStorage) -- tracks whether "Continue"
-// on the title screen should be enabled, plus every setting the Settings
-// screen exposes (Gameplay/Sound/Controls/Graphics)
+// persisted across sessions (localStorage)
 save.add({
     hasSave: false,
     screenShake: true,
@@ -47,9 +38,6 @@ save.add({
     masterMuted: false,
     musicVolume: 1,
     sfxVolume: 1,
-    // pixel art game -- nearest-neighbor by default, or every scaled-up
-    // sprite (buttons, corner ornaments, etc.) renders blurry instead of
-    // crisp. Players can still switch to smooth filtering in Settings.
     pixelPerfect: true,
     antiAliasing: false,
     keyBindings: {
@@ -61,8 +49,7 @@ save.add({
     },
 });
 
-// apply saved settings that need to take effect immediately, before the
-// player ever opens the Settings screen
+// apply saved settings that need to take effect immediately, before the player ever opens the Settings screen
 if (save.masterMuted) {
     audio.muteAll();
 }
@@ -78,12 +65,10 @@ const GAME_LOGO = state.USER + 1;
 
 // set and load all resources
 loader.preload(DataManifest, () => {
-    // fade to black between every state change instead of a hard cut --
-    // this is what makes the studio logo -> game logo -> title screen
-    // sequence feel like a boot sequence instead of a slideshow
+
     state.transition("fade", "#000000", 400);
 
-    // boot sequence: studio logo -> game logo -> title screen
+    // boot sequence: studio logo - game logo - title screen
     state.set(
         STUDIO_LOGO,
         new SplashScreen({

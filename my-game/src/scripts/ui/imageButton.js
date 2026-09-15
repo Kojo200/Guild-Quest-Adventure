@@ -1,5 +1,5 @@
 import { UIBaseElement, NineSliceSprite, Text, Tween, audio, save } from "melonjs";
-import { getButtonAtlas } from "./buttonAtlas";
+import { getButtonAtlas } from "./atlas";
 
 const INSET_X = 12;
 const INSET_Y = 6;
@@ -9,6 +9,8 @@ const SHADOW_OFFSET_Y = 5;
 
 const HOVER_SCALE = 1.08;
 const TWEEN_DURATION = 140;
+
+const CLICK_SOUND_COOLDOWN_MS = 400;
 
 const TEXT_COLOR = "#4a2e18";
 const DISABLED_TEXT_COLOR = "#888888";
@@ -20,22 +22,24 @@ const TEXT_Z = 2;
 
 class imageButton extends UIBaseElement {
     #disabled;
-    #onAction;
+    #onActionCallback;
     #width;
     #height;
     #baseX;
     #baseY;
     #background;
     #shadow;
+    #label;
     #scaleState = { value: 1 };
     #tween;
+    #lastClickTime = -Infinity;
 
     constructor(x, y, settings) {
         const { width, height, text, onAction, disabled = false } = settings;
         super(x, y, width, height);
 
         this.#disabled = disabled;
-        this.#onAction = onAction;
+        this.#onActionCallback = onAction;
         this.#width = width;
         this.#height = height;
         this.#baseX = x;
@@ -69,7 +73,7 @@ class imageButton extends UIBaseElement {
         this.#background.floating = false;
         this.addChild(this.#background, BACKGROUND_Z);
 
-        const label = new Text(width / 2, height / 2, {
+        this.#label = new Text(width / 2, height / 2, {
             font: "sans-serif",
             size: Math.round(height * 0.42),
             fillStyle: disabled ? DISABLED_TEXT_COLOR : TEXT_COLOR,
@@ -77,13 +81,19 @@ class imageButton extends UIBaseElement {
             textBaseline: "middle",
             text,
         });
-        label.floating = false;
-        this.addChild(label, TEXT_Z);
+        this.#label.floating = false;
+        this.addChild(this.#label, TEXT_Z);
+    }
+
+    setText(text) {
+        this.#label.setText(text);
     }
 
     onOver(event) {
         if (!this.#disabled) {
-            audio.play("button_hover", false, null, save.sfxVolume);
+            if (performance.now() - this.#lastClickTime > CLICK_SOUND_COOLDOWN_MS) {
+                audio.play("button_hover", false, null, save.sfxVolume);
+            }
             this.#shadow.setOpacity(0);
             this.#setBackgroundRegion("button_hover");
             this.#tweenScaleTo(HOVER_SCALE);
@@ -101,9 +111,14 @@ class imageButton extends UIBaseElement {
     }
 
     onClick(event) {
+        this.#lastClickTime = performance.now();
         audio.play("button_select", false, null, save.sfxVolume);
-        this.#onAction?.();
+        this.onAction();
         return false;
+    }
+
+    onAction() {
+        this.#onActionCallback?.();
     }
 
     #setBackgroundRegion(regionName) {

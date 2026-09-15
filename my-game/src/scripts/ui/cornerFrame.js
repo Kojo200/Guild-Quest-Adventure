@@ -1,5 +1,5 @@
 import { Sprite } from "melonjs";
-import { getFrameAtlas } from "./frameAtlas";
+import { getFrameAtlas } from "./atlas";
 
 const DEFAULT_SCALE = 6;
 const DEFAULT_MARGIN = 14;
@@ -15,7 +15,7 @@ export function addCornerOrnaments(addChild, width, height, options = {}) {
     const { scale = DEFAULT_SCALE, margin = DEFAULT_MARGIN, z = 1 } = options;
     const atlas = getFrameAtlas();
     const region = atlas.getRegion("corner_ornament");
-    const size = region.width * scale;
+    const size = region.width * scale; // native asset is square
 
     const corners = [
         { x: margin, y: margin, flipX: false, flipY: false },
