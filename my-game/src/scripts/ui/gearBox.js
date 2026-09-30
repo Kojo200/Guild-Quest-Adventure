@@ -9,60 +9,73 @@ import { SLOT_ICON } from "../equipment";
 const MARGIN = 20;
 const GOLD = "#c9a86a";
 
-const GEAR_WIDTH = 310;
-const GEAR_HEIGHT = 300;
+const EQUIP_WIDTH = 180;
+const INVENTORY_WIDTH = 310;
+const EQUIP_HEIGHT = 200;
+const INVENTORY_HEIGHT = 260;
 const GEAR_TITLE_AREA = 26;
 
 const EQUIP_COLUMN_WIDTH = 150;
 
-const GEAR_SLOT_SIZE = 36;
+const GEAR_SLOT_SIZE = 32;
 const GEAR_SLOT_GAP = 6;
 
 const INVENTORY_BUTTON_WIDTH = 60;
 const INVENTORY_BUTTON_HEIGHT = 22;
 const INVENTORY_BUTTON_MARGIN = 6;
 
-export function buildGearBox(addChild, width, height, viewState) {
+function gearBoxOrigin(width, height) {
+    return { right: width - MARGIN, top: height - INVENTORY_HEIGHT - MARGIN };
+}
+
+export function buildGearBoxChrome(addChild, width, height, onToggleInventory) {
+    const { right, top } = gearBoxOrigin(width, height);
+
+    const titleText = new Text(right - INVENTORY_WIDTH + GEAR_SLOT_GAP, top + GEAR_SLOT_GAP, {
+        font: "sans-serif",
+        size: 12,
+        fillStyle: GOLD,
+        textAlign: "left",
+        textBaseline: "top",
+        text: "Gear",
+    });
+    addChild(titleText, 3);
+
+    const invButton = new actionButton(
+        right - INVENTORY_BUTTON_WIDTH - INVENTORY_BUTTON_MARGIN,
+        top + INVENTORY_BUTTON_MARGIN,
+        INVENTORY_BUTTON_WIDTH,
+        INVENTORY_BUTTON_HEIGHT,
+        "Inv",
+        onToggleInventory,
+    );
+    addChild(invButton, 5);
+
+    return { titleText, invButton };
+}
+
+export function buildGearBoxContent(addChild, width, height, viewState, chrome) {
     const { inventoryOpen, equipped, inventoryCategory, lockedCategory } = viewState;
-    const { onToggleInventory, onSlotClick, onSelectCategory, onSelectItem } = viewState;
+    const { onSlotClick, onSelectCategory, onSelectItem } = viewState;
 
-    const x = width - GEAR_WIDTH - MARGIN;
-    const y = height - GEAR_HEIGHT - MARGIN;
+    const { right, top } = gearBoxOrigin(width, height);
+    const boxWidth = inventoryOpen ? INVENTORY_WIDTH : EQUIP_WIDTH;
+    const boxHeight = inventoryOpen ? INVENTORY_HEIGHT : EQUIP_HEIGHT;
+    const x = right - boxWidth;
+    const y = top;
 
-    const [fill, frame] = createWindowFrame(x, y, GEAR_WIDTH, GEAR_HEIGHT);
+    chrome.titleText.pos.x = x + GEAR_SLOT_GAP;
+
+    const [fill, frame] = createWindowFrame(x, y, boxWidth, boxHeight);
     addChild(fill, 1);
     addChild(frame, 2);
-
-    addChild(
-        new Text(x + GEAR_SLOT_GAP, y + GEAR_SLOT_GAP, {
-            font: "sans-serif",
-            size: 12,
-            fillStyle: GOLD,
-            textAlign: "left",
-            textBaseline: "top",
-            text: inventoryOpen ? "Inventory" : "Gear",
-        }),
-        3,
-    );
-
-    addChild(
-        new actionButton(
-            x + GEAR_WIDTH - INVENTORY_BUTTON_WIDTH - INVENTORY_BUTTON_MARGIN,
-            y + INVENTORY_BUTTON_MARGIN,
-            INVENTORY_BUTTON_WIDTH,
-            INVENTORY_BUTTON_HEIGHT,
-            inventoryOpen ? "Back" : "Inv",
-            onToggleInventory,
-        ),
-        5,
-    );
 
     if (inventoryOpen) {
         buildInventoryView(
             addChild,
             x,
             y,
-            GEAR_WIDTH,
+            boxWidth,
             GEAR_TITLE_AREA,
             inventoryCategory,
             lockedCategory,

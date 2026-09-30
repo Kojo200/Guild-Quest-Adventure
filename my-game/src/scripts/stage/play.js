@@ -1,8 +1,8 @@
-import { ColorLayer, state, input } from "melonjs";
+import { state, input, level } from "melonjs";
 import responsiveStage from "./responsiveStage";
 import statBar from "../ui/statBar";
 import { buildMinimap } from "../ui/miniMap";
-import { buildGearBox } from "../ui/gearBox";
+import { buildGearBoxChrome, buildGearBoxContent } from "../ui/gearBox";
 import { buildPauseOverlay } from "../ui/pause";
 import { navigation } from "../navigation";
 import { equipped } from "../equipment";
@@ -15,11 +15,17 @@ const BAR_WIDTH = 220;
 const BAR_HEIGHT = 18;
 const BAR_GAP = 6;
 
+const HUD_Z_BASE = 1000;
+
 class PlayScreen extends responsiveStage {
     #paused = false;
     #inventoryOpen = false;
     #inventoryCategory = ALL_CATEGORY;
-    #inventoryLockedSlot = null; // which equip slot triggered the inventory, if any
+    #inventoryLockedSlot = null;
+    #app;
+    #gearBoxChrome;
+    #gearBoxChildren = [];
+    #levelLoaded = false;
     #onKeyDown = (event) => {
         if (event.keyCode === input.KEY.ESC) {
             if (this.#inventoryOpen) {
@@ -30,13 +36,11 @@ class PlayScreen extends responsiveStage {
         }
     };
 
-    /**
-     * @param {import("melonjs").Application} app
-     */
     onResetEvent(app) {
         this.#paused = navigation.returnPaused;
         navigation.returnPaused = false;
-        super.onResetEvent(app); // builds the layout below + resize handling
+        this.#levelLoaded = false;
+        super.onResetEvent(app);
         window.addEventListener("keydown", this.#onKeyDown);
     }
 
@@ -56,19 +60,20 @@ class PlayScreen extends responsiveStage {
         if (this.#inventoryOpen) {
             this.#inventoryCategory = ALL_CATEGORY;
         }
-        this.refresh();
+        this.#rebuildGearBoxContent();
     }
 
     #closeInventory() {
         this.#inventoryOpen = false;
         this.#inventoryLockedSlot = null;
-        this.refresh();
+        this.#rebuildGearBoxContent();
     }
 
     #onSlotClick(slotKey) {
         this.#inventoryLockedSlot = slotKey;
         this.#inventoryOpen = true;
         this.#inventoryCategory = ALL_CATEGORY;
+        this.#rebuildGearBoxContent();
     }
 
     #onSelectItem(itemId) {
@@ -79,28 +84,25 @@ class PlayScreen extends responsiveStage {
     }
 
     layout(app) {
+        this.#app = app;
         const { width, height } = app.viewport;
-        const addChild = (child, z) => this.addLayoutChild(child, z);
+        const addChild = (child, z) => {
+            child.floating = true;
+            this.addLayoutChild(child, HUD_Z_BASE + z);
+        };
 
-        // TODO: replace with the guild hub / quest level once it's built
-        this.addLayoutChild(new ColorLayer("background", "#202020"), 0);
+        if (!this.#levelLoaded) {
+            // TODO: replace with the guild hub / full world map once
+            // that exists -- this is the standalone tutorial area for now
+            level.load("Tutorial_area");
+            this.#levelLoaded = true;
+        }
 
         buildMinimap(addChild, width);
         this.#buildStatBars(height);
 
-        buildGearBox(addChild, width, height, {
-            inventoryOpen: this.#inventoryOpen,
-            equipped,
-            inventoryCategory: this.#inventoryCategory,
-            lockedCategory: this.#inventoryLockedSlot ? SLOT_CATEGORY[this.#inventoryLockedSlot] : null,
-            onToggleInventory: () => this.#toggleInventory(),
-            onSlotClick: (slotKey) => this.#onSlotClick(slotKey),
-            onSelectCategory: (category) => {
-                this.#inventoryCategory = category;
-                this.refresh();
-            },
-            onSelectItem: (itemId) => this.#onSelectItem(itemId),
-        });
+        this.#gearBoxChrome = buildGearBoxChrome(addChild, width, height, () => this.#toggleInventory());
+        this.#rebuildGearBoxContent();
 
         if (this.#paused) {
             buildPauseOverlay(
@@ -118,6 +120,37 @@ class PlayScreen extends responsiveStage {
         }
     }
 
+    #rebuildGearBoxContent() {
+        const app = this.#app;
+        for (const child of this.#gearBoxChildren) {
+            app.world.removeChildNow(child);
+        }
+        this.#gearBoxChildren = [];
+
+        const addChild = (child, z) => {
+            child.floating = true; 
+            app.world.addChild(child, HUD_Z_BASE + z);
+            this.#gearBoxChildren.push(child);
+        };
+
+        this.#gearBoxChrome.titleText.setText(this.#inventoryOpen ? "Inventory" : "Gear");
+        this.#gearBoxChrome.invButton.setText(this.#inventoryOpen ? "Back" : "Inv");
+
+        const { width, height } = app.viewport;
+        buildGearBoxContent(addChild, width, height, {
+            inventoryOpen: this.#inventoryOpen,
+            equipped,
+            inventoryCategory: this.#inventoryCategory,
+            lockedCategory: this.#inventoryLockedSlot ? SLOT_CATEGORY[this.#inventoryLockedSlot] : null,
+            onSlotClick: (slotKey) => this.#onSlotClick(slotKey),
+            onSelectCategory: (category) => {
+                this.#inventoryCategory = category;
+                this.#rebuildGearBoxContent();
+            },
+            onSelectItem: (itemId) => this.#onSelectItem(itemId),
+        }, this.#gearBoxChrome);
+    }
+
     #buildStatBars(height) {
         const hpY = height - MARGIN - BAR_HEIGHT * 2 - BAR_GAP;
         const mpY = height - MARGIN - BAR_HEIGHT;
@@ -125,10 +158,12 @@ class PlayScreen extends responsiveStage {
         // TODO: wire these up to real player stats -- constructor
         // defaults to full, since there's no player/HP/MP data yet
         const hpBar = new statBar(MARGIN, hpY, BAR_WIDTH, BAR_HEIGHT, "bar_fill_hp");
-        this.addLayoutChild(hpBar, 1);
+        hpBar.floating = true;
+        this.addLayoutChild(hpBar, HUD_Z_BASE + 1);
 
         const mpBar = new statBar(MARGIN, mpY, BAR_WIDTH, BAR_HEIGHT, "bar_fill_mp");
-        this.addLayoutChild(mpBar, 1);
+        mpBar.floating = true;
+        this.addLayoutChild(mpBar, HUD_Z_BASE + 1);
     }
 }
 

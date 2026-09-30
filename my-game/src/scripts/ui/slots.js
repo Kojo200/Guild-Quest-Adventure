@@ -84,8 +84,8 @@ class slotButton extends UIBaseElement {
         const children = [];
         const statCount = Object.keys(this.#tooltipItem.stats).length;
         const panelHeight = TOOLTIP_PADDING * 2 + TOOLTIP_TITLE_GAP + statCount * TOOLTIP_STAT_GAP;
-        const panelX = this.#size + TOOLTIP_GAP;
-        const panelY = 0;
+        const panelX = this.#size - TOOLTIP_WIDTH;
+        const panelY = this.#size + TOOLTIP_GAP;
 
         const [fill, frame] = createWindowFrame(panelX, panelY, TOOLTIP_WIDTH, panelHeight);
         children.push(fill, frame);

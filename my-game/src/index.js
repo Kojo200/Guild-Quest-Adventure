@@ -4,6 +4,7 @@ import PlayScreen from "./scripts/stage/play";
 import SettingsScreen from "./scripts/stage/settings";
 import SplashScreen from "./scripts/stage/splashscreen";
 import PlayerEntity from "./scripts/renderables/player";
+import PlayerStart from "./scripts/renderables/playerStart";
 import DataManifest from "./manifest";
 import "./index.css";
 
@@ -29,7 +30,6 @@ if (import.meta.env.DEV) {
     });
 }
 
-// persisted across sessions (localStorage)
 save.add({
     hasSave: false,
     screenShake: true,
@@ -49,7 +49,6 @@ save.add({
     },
 });
 
-// apply saved settings that need to take effect immediately, before the player ever opens the Settings screen
 if (save.masterMuted) {
     audio.muteAll();
 }
@@ -59,16 +58,15 @@ for (const [action, keyCode] of Object.entries(save.keyBindings)) {
     input.bindKey(keyCode, action);
 }
 
-// custom boot-sequence states, on top of melonJS's built-in ones
+// custom boot-sequence
 const STUDIO_LOGO = state.USER + 0;
 const GAME_LOGO = state.USER + 1;
 
 // set and load all resources
 loader.preload(DataManifest, () => {
-
     state.transition("fade", "#000000", 400);
 
-    // boot sequence: studio logo - game logo - title screen
+    // boot sequence
     state.set(
         STUDIO_LOGO,
         new SplashScreen({
@@ -91,13 +89,12 @@ loader.preload(DataManifest, () => {
         }),
     );
 
-    // set the user defined game stages
     state.set(state.MENU, new TitleScreen());
     state.set(state.PLAY, new PlayScreen());
     state.set(state.SETTINGS, new SettingsScreen());
 
-    // add our player entity in the entity pool
     pool.register("mainPlayer", PlayerEntity);
+    pool.register("PlayerStart", PlayerStart);
 
     // start the game
     state.change(STUDIO_LOGO, false);

@@ -10,7 +10,7 @@ const TAB_COLS = 3;
 const SLOT_SIZE = 32;
 const SLOT_GAP = 4;
 const COLS = 6;
-const ROWS = 5;
+const ROWS = 4;
 
 export const ALL_CATEGORY = "all";
 const TAB_CATEGORIES = [ALL_CATEGORY, ...CATEGORIES];
@@ -58,6 +58,9 @@ export function buildInventoryView(
         gridTop = topOffset + tabRows * (TAB_HEIGHT + TAB_GAP) + 6;
     }
 
+    // TODO: show the player's actual carried items/quantities once an
+    // inventory system exists -- this is items.js's mock catalog, not
+    // owned items, so every entry always shows up
     const items = category === ALL_CATEGORY ? CATEGORIES.flatMap((cat) => ITEMS[cat] ?? []) : (ITEMS[category] ?? []);
     const step = SLOT_SIZE + SLOT_GAP;
     const gridWidth = COLS * SLOT_SIZE + (COLS - 1) * SLOT_GAP;

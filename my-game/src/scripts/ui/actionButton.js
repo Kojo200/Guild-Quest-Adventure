@@ -7,7 +7,8 @@ const HOVER_SCALE = 1.08;
 const TWEEN_DURATION = 140;
 const TEXT_COLOR = "#dddddd";
 
-const CLICK_SOUND_COOLDOWN_MS = 400;
+const HOVER_COOLDOWN_MS = 400;
+let lastAnyClickTime = -Infinity;
 
 class actionButton extends UIBaseElement {
     #background;
@@ -16,9 +17,9 @@ class actionButton extends UIBaseElement {
     #width;
     #height;
     #onAction;
+    #label;
     #scaleState = { value: 1 };
     #tween;
-    #lastClickTime = -Infinity;
 
     constructor(x, y, width, height, text, onAction) {
         super(x, y, width, height);
@@ -39,7 +40,7 @@ class actionButton extends UIBaseElement {
         this.#background.floating = false;
         this.addChild(this.#background, 0);
 
-        const label = new Text(width / 2, height / 2, {
+        this.#label = new Text(width / 2, height / 2, {
             font: "sans-serif",
             size: 14,
             fillStyle: TEXT_COLOR,
@@ -47,16 +48,25 @@ class actionButton extends UIBaseElement {
             textBaseline: "middle",
             text,
         });
-        label.floating = false;
-        this.addChild(label, 1);
+        this.#label.floating = false;
+        this.addChild(this.#label, 1);
+    }
+
+    setText(text) {
+        this.#label.setText(text);
+    }
+
+    setOnAction(onAction) {
+        this.#onAction = onAction;
     }
 
     onOver(event) {
-        if (performance.now() - this.#lastClickTime > CLICK_SOUND_COOLDOWN_MS) {
+        
+        if (performance.now() - lastAnyClickTime > HOVER_COOLDOWN_MS) {
             audio.play("button_hover", false, null, save.sfxVolume);
+            this.#setRegion("tab_hover");
+            this.#tweenScaleTo(HOVER_SCALE);
         }
-        this.#setRegion("tab_hover");
-        this.#tweenScaleTo(HOVER_SCALE);
         return super.onOver(event);
     }
 
@@ -67,7 +77,7 @@ class actionButton extends UIBaseElement {
     }
 
     onClick(event) {
-        this.#lastClickTime = performance.now();
+        lastAnyClickTime = performance.now();
         audio.play("button_select", false, null, save.sfxVolume);
         this.#onAction();
         return false;
