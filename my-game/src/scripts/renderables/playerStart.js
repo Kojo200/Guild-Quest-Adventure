@@ -1,6 +1,6 @@
 import { Renderable } from "melonjs";
 
-class PlayerStart extends Renderable {
+class MapMarker extends Renderable {
     constructor(x, y, settings) {
         super(x, y, settings.width || 1, settings.height || 1);
         this.name = settings.name;
@@ -12,4 +12,4 @@ class PlayerStart extends Renderable {
     }
 }
 
-export default PlayerStart;
+export default MapMarker;

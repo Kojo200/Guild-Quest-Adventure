@@ -114,6 +114,25 @@ const DataManifest = [
         name: "Objects",
         type: "image",
         src: "/data/tilesets/treasure/Objects.png"
+    },
+    {
+        name: "Sign",
+        type: "image",
+        src: "/data/tilesets/signs/Sign.png"
+    },
+
+    // player - placeholder
+    {
+        name: "player_placeholder",
+        type: "image",
+        src: "/data/img/player/player_placeholder.png"
+    },
+
+    // minimap terrain
+    {
+        name: "minimap_terrain",
+        type: "image",
+        src: "/data/img/minimap_terrain.png"
     }
 ];
 
